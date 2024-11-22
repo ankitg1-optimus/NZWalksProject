@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NZWalksAPI.CustomActionFilters;
 using NZWalksAPI.Data;
 using NZWalksAPI.Models;
 using NZWalksAPI.Models.Domain;
@@ -50,38 +51,43 @@ namespace NZWalksAPI.Controllers
         }
 
         [HttpPost]
+        [ValidateModel]
         public async Task<IActionResult> CreateRegion([FromBody]RegionDTO regionDTO) {
             try
             {
-                ///map to domain model
-                var regionDomain = _mapper.Map<Region>(regionDTO);
-                //add model
-                regionDomain = await _regionRepository.AddRegionAsync(regionDomain);
-                //map back to DTO
-                var addedRegion = _mapper.Map<RegionDTO>(regionDomain);
+                    ///map to domain model
+                    var regionDomain = _mapper.Map<Region>(regionDTO);
+                    //add model
+                    regionDomain = await _regionRepository.AddRegionAsync(regionDomain);
+                    //map back to DTO
+                    var addedRegion = _mapper.Map<RegionDTO>(regionDomain);
 
-                return CreatedAtAction(nameof(GetById), new {id = regionDomain.Id}, addedRegion);
+                    return CreatedAtAction(nameof(GetById), new { id = regionDomain.Id }, addedRegion);
             }
-            catch (Exception) {
+            catch (Exception)
+            {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [ValidateModel]
         public async Task<IActionResult> UpdateRegion([FromRoute]Guid id, [FromBody]RegionDTO regionDTO ) {
             try
             {
-                //map DTO to Domain Model
-                var regionDomainModel = _mapper.Map<Region>(regionDTO);
-                regionDomainModel = await _regionRepository.UpdateRegionAsync(id, regionDomainModel);
+                    //map DTO to Domain Model
+                    var regionDomainModel = _mapper.Map<Region>(regionDTO);
+                    regionDomainModel = await _regionRepository.UpdateRegionAsync(id, regionDomainModel);
 
-                if (regionDomainModel == null) {
-                    return NotFound();
-                }
-                return Ok(_mapper.Map<RegionDTO>(regionDomainModel));
+                    if (regionDomainModel == null)
+                    {
+                        return NotFound();
+                    }
+                    return Ok(_mapper.Map<RegionDTO>(regionDomainModel));
             }
-            catch (Exception) {
+            catch (Exception)
+            {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

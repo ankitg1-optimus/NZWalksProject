@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NZWalksAPI.CustomActionFilters;
 using NZWalksAPI.Models.Domain;
 using NZWalksAPI.Models.DTO;
 using NZWalksAPI.Repositories;
@@ -21,12 +22,13 @@ namespace NZWalksAPI.Controllers
         private readonly IWalkRepository _walkRepository;
 
         [HttpPost]
+        [ValidateModel]
         public async Task<IActionResult> Create([FromBody] AddUpdateWalkDTO addWalkDTO)
         {
-            //map Dto to domain model
-            var walkDomain = _mapper.Map<Walk>(addWalkDTO);
-            var createdModel = await _walkRepository.CreateAsync(walkDomain);
-            return Ok(_mapper.Map<WalkDTO>(createdModel));
+                //map Dto to domain model
+                var walkDomain = _mapper.Map<Walk>(addWalkDTO);
+                var createdModel = await _walkRepository.CreateAsync(walkDomain);
+                return Ok(_mapper.Map<WalkDTO>(createdModel));
         }
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -47,11 +49,12 @@ namespace NZWalksAPI.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [ValidateModel]
         public async Task<IActionResult> Update([FromRoute]Guid id, AddUpdateWalkDTO walkDTO)
         {
-            var updatedModel = await _walkRepository.UpdateAsync(id, _mapper.Map<Walk>(walkDTO));
-            if(updatedModel== null) return NotFound();
-            return Ok(_mapper.Map<WalkDTO>(updatedModel));
+                var updatedModel = await _walkRepository.UpdateAsync(id, _mapper.Map<Walk>(walkDTO));
+                if(updatedModel== null) return NotFound();
+                return Ok(_mapper.Map<WalkDTO>(updatedModel));
         }
         [HttpDelete]
         [Route("{id:Guid}")]
