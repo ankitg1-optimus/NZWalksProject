@@ -22,12 +22,23 @@ namespace NZWalksAPI.Repositories
         }
 
 
-        public async Task<List<Walk>> GetAllAsync(string? filterOn, string? filterQuery)
+        public async Task<List<Walk>> GetAllAsync(string? filterOn, string? filterQuery, string? sortBy, bool? isAscending)
         {
             var walks = _dbContext.Walks.Include("Difficulty").Include("Region").AsQueryable();
+
+            //Filtering
             if (string.IsNullOrWhiteSpace(filterOn) == false && string.IsNullOrWhiteSpace(filterQuery) == false)
             {
-                walks = walks.Where(w=>EF.Property<string>(w,filterOn).Contains(filterQuery));
+                walks = walks.Where(w => EF.Property<string>(w, filterOn).Contains(filterQuery));
+            }
+            //sorting
+            if (string.IsNullOrWhiteSpace(sortBy) == false)
+            {
+
+                walks = isAscending == true ?
+                    walks.OrderBy(w => EF.Property<string>(w, sortBy))
+                    : walks.OrderByDescending(w => EF.Property<string>(w, sortBy))
+                    ;
             }
             return await walks.ToListAsync();
         }
