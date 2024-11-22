@@ -7,7 +7,8 @@ namespace NZWalksAPI.Repositories
 
     public class SQLWalkRepository : IWalkRepository
     {
-        public SQLWalkRepository(DataContext dbContext) {
+        public SQLWalkRepository(DataContext dbContext)
+        {
             _dbContext = dbContext;
         }
 
@@ -21,14 +22,19 @@ namespace NZWalksAPI.Repositories
         }
 
 
-        public async Task<List<Walk>> GetAllAsync()
+        public async Task<List<Walk>> GetAllAsync(string? filterOn, string? filterQuery)
         {
-            return await _dbContext.Walks.Include("Difficulty").Include("Region").ToListAsync();          
+            var walks = _dbContext.Walks.Include("Difficulty").Include("Region").AsQueryable();
+            if (string.IsNullOrWhiteSpace(filterOn) == false && string.IsNullOrWhiteSpace(filterQuery) == false)
+            {
+                walks = walks.Where(w=>EF.Property<string>(w,filterOn).Contains(filterQuery));
+            }
+            return await walks.ToListAsync();
         }
 
         public async Task<Walk?> GetByIdAsync(Guid id)
         {
-            return await _dbContext.Walks.Include("Difficulty").Include("Region").FirstOrDefaultAsync(x=>x.Id ==id);
+            return await _dbContext.Walks.Include("Difficulty").Include("Region").FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<Walk?> UpdateAsync(Guid id, Walk walk)
