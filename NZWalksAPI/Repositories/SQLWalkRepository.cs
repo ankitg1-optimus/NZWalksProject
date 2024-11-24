@@ -22,7 +22,7 @@ namespace NZWalksAPI.Repositories
         }
 
 
-        public async Task<List<Walk>> GetAllAsync(string? filterOn, string? filterQuery, string? sortBy, bool? isAscending)
+        public async Task<List<Walk>> GetAllAsync(string? filterOn, string? filterQuery, string? sortBy, bool? isAscending, int pageNumber, int pageSize)
         {
             var walks = _dbContext.Walks.Include("Difficulty").Include("Region").AsQueryable();
 
@@ -40,7 +40,10 @@ namespace NZWalksAPI.Repositories
                     : walks.OrderByDescending(w => EF.Property<string>(w, sortBy))
                     ;
             }
-            return await walks.ToListAsync();
+            //pagination
+            var skipResults = (pageNumber - 1) * pageSize;
+
+            return await walks.Skip(skipResults).Take(pageSize).ToListAsync();
         }
 
         public async Task<Walk?> GetByIdAsync(Guid id)

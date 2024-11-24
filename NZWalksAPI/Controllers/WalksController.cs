@@ -22,10 +22,11 @@ namespace NZWalksAPI.Controllers
         private readonly IWalkRepository _walkRepository;
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] string? filterOn, [FromQuery] string? filterQuery, string? sortBy, [FromQuery] bool? isAscending)
+        public async Task<IActionResult> GetAll([FromQuery] string? filterOn, [FromQuery] string? filterQuery, string? sortBy, [FromQuery] bool? isAscending, 
+            [FromQuery]int pageNumber =1, [FromQuery]int pageSize=3)
         {
             //map Dto to domain model
-            var walks = await _walkRepository.GetAllAsync(filterOn, filterQuery, sortBy, isAscending);
+            var walks = await _walkRepository.GetAllAsync(filterOn, filterQuery, sortBy, isAscending ?? true, pageNumber, pageSize);
             return Ok(_mapper.Map<List<WalkDTO>>(walks));
 
         }
