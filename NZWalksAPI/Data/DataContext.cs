@@ -80,8 +80,8 @@ namespace NZWalksAPI.Data
                     RegionImageUrl = null
                 }
             };
-
             modelBuilder.Entity<Region>().HasData(regions);
+
             base.OnModelCreating(modelBuilder);
         }
     }
