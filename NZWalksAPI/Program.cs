@@ -23,6 +23,7 @@ namespace NZWalksAPI
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
+
             builder.Services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1",new OpenApiInfo { Title="NZ Walks API", Version="v1"});
@@ -44,7 +45,6 @@ namespace NZWalksAPI
                                 Type = ReferenceType.SecurityScheme,
                                 Id = JwtBearerDefaults.AuthenticationScheme
                             },
-                            Scheme = "Oauth2",
                             Name = JwtBearerDefaults.AuthenticationScheme,
                             In = ParameterLocation.Header
                         },
@@ -62,7 +62,10 @@ namespace NZWalksAPI
 
             builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
 
-            builder.Services.AddIdentityCore<IdentityUser>().AddRoles<IdentityRole>().AddTokenProvider<DataProtectorTokenProvider<IdentityUser>>("NzWalks").AddEntityFrameworkStores<AuthDbContext>().AddDefaultTokenProviders();
+            builder.Services.AddIdentityCore<IdentityUser>()
+                .AddRoles<IdentityRole>()
+                .AddTokenProvider<DataProtectorTokenProvider<IdentityUser>>("NzWalks")
+                .AddEntityFrameworkStores<AuthDbContext>().AddDefaultTokenProviders();
             
             builder.Services.Configure<IdentityOptions>(options =>
             {
@@ -75,16 +78,20 @@ namespace NZWalksAPI
             });
 
 
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                ValidAudience = builder.Configuration["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-            });
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options => 
+                options.TokenValidationParameters = 
+                    new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                    }
+                );
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

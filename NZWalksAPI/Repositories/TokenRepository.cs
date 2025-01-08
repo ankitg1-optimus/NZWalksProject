@@ -18,7 +18,7 @@ namespace NZWalksAPI.Repositories
         {
             //Create Claims
             var claims = new List<Claim>();
-            claims.Add(new Claim(ClaimTypes.Email, user.Email ));
+            claims.Add(new Claim(ClaimTypes.Email, user.Email));
             foreach (var role in roles) { 
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
